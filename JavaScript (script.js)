@@ -1,0 +1,34 @@
+const searchInput = document.getElementById('search-input');
+const usersList = document.getElementById('users-list');
+
+// Функция для получения данных о пользователях
+async function fetchUsers(searchTerm) {
+  const response = await fetch(`/api/users?searchTerm=${searchTerm}`);
+  const data = await response.json();
+  return data;
+}
+
+// Функция для отображения списка пользователей
+function displayUsers(users) {
+  usersList.innerHTML = '';
+  users.forEach(user => {
+    const userCard = document.createElement('div');
+    userCard.classList.add('user-card');
+    userCard.innerHTML = `
+      <img src="${user.avatarUrl}" alt="${user.name}">
+      <h3>${user.name}</h3>
+    `;
+    usersList.appendChild(userCard);
+  });
+}
+
+// Обработчик ввода в поле поиска
+searchInput.addEventListener('input', async () => {
+  const searchTerm = searchInput.value.trim();
+  const data = await fetchUsers(searchTerm);
+  displayUsers(data.result);
+});
+
+// Загрузка начального списка пользователей
+fetchUsers('')
+  .then(data => displayUsers(data.result));
